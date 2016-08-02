@@ -31,25 +31,55 @@
 call_user_func(function () {
   if (is_admin()) return;
 
-  require_once('assist.php');
-
 /*╔══════════════════╗
   ║ Modify Raw-HTML. ║
   ╚══════════════════╝*/
   add_action('template_redirect', function (){
     @ob_start(function($html){
     /*────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────*/
+    /*╔═════════╗
+      ║ protect ║
+      ╚═════════╝*/
+                $html = call_user_func(function () use($html){            /*    protect pre-tags and code-tags original content.  */
+                    $tags_to_protect = [ 'pre'        => '_p_r_e_'
+                                       , 'code'     => '_c_o_d_e_'
+                                       , 'textarea' => '_t_e_x_t_a_r_e_a_'
+                                       ];
+                    foreach ($tags_to_protect as $tag => $protected_tag) {
+                      $html = preg_replace_callback("#<" . $tag . "(.*?)>(.*?)</" . $tag . ">#is", function ($arr) use ($tag, $protected_tag) {
+                        if (!isset($arr[0])) return; /* no found: no add, no delete */
+                        $full = $arr[0];
+                        return '<' . $protected_tag . '>' . base64_encode(gzcompress($full)) . '</' . $protected_tag . '>'; /*                      clean from HTML. */
+                      }, $html);
+                    }
+                    return $html;
+                });
+                /*-------------------------------------------------------------------------------------------------------------*/
     /*╔═══════╗
       ║ $html ║
       ╚═══════╝*/
-                $html = protect_specific_tags_from_modifications($html);     /*    protect pre-tags and code-tags original content.  */
-                /*-------------------------------------------------------------------------------------------------------------*/
                 $html = preg_replace("#(\<\s*link[^\>]*href\s*=\s*[\"\']([^\"\']*(jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[^\"\']*)[\"\'][^\>]*\>)#msi"
                 , "<!-- STYLE-KILLER:[\"$3\"]/REMOVED:[\"$2\"] -->",$html);
                 $html = preg_replace("#(\<\s*script[^\>]*src\s*=\s*[\"\']([^\"\']*(jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[^\"\']*)[\"\'][^\>]*\>\s*</script[^\>]*>)#msi"
                 , "<!-- SCRIPT-KILLER:[\"$3\"]/REMOVED:[\"$2\"] -->",$html);
                 /*-------------------------------------------------------------------------------------------------------------*/
-                $html = unprotect_pre_and_code_tags_content_from_change($html);  /*  unprotect (bring back) pre-tags and code-tags original content. */
+    /*╔═══════════╗
+      ║ unprotect ║
+      ╚═══════════╝*/
+                $html = call_user_func(function () use($html){            /*  unprotect (bring back) pre-tags and code-tags original content. */
+                  $tags_to_unprotect = [ '_p_r_e_'
+                                       , '_c_o_d_e_'
+                                       , '_t_e_x_t_a_r_e_a_'
+                                       ];
+                  foreach ($tags_to_unprotect as $index => $tag) {
+                    $html = preg_replace_callback("#<" . $tag . ">(.*?)</" . $tag . ">#is", function ($arr) use ($tag) {
+                      if (!isset($arr[0])) return; /*no found: no add, no delete*/
+                      $inline = $arr[1];
+                      return gzuncompress(base64_decode($inline)); /*                      clean from HTML. */
+                    }, $html);
+                  }
+                  return $html;
+                });
     /*────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────*/
                 return $html;
              });
