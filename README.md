@@ -1,4 +1,4 @@
-# Minifier
+# Script-Style-Killer
 ## A WordPress Raw HTML Processing For PHP Developers (And Everyone Else Too...)
 
 '''PHP5
@@ -13,7 +13,7 @@
    ║ I'm Doing It For The Fun Of It :]                   ║
    ║                                                     ║
    ║    - Elad Karako                                    ║
-   ║         Tel-Aviv, Israel- July 2016.                ║
+   ║         Tel-Aviv, Israel- August 2016.              ║
    ╚═════════════════════════════════════════════════════╝
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ */
 '''
