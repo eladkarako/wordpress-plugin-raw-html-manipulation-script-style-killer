@@ -44,18 +44,10 @@ call_user_func(function () {
       ╚═══════╝*/
                 $html = protect_specific_tags_from_modifications($html);     /*    protect pre-tags and code-tags original content.  */
                 /*-------------------------------------------------------------------------------------------------------------*/
-
-                $html = preg_replace(
-                            "#\<\s*link[^\>]*href\s*=\s*[\"\'](jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[\"\'][^\>]*\>#msi"
-                          , ''
-                          , $html
-                        );
-
-                $html = preg_replace(
-                            "#\<\s*script[^\>]*src\s*=\s*[\"\'](jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[\"\'][^\>]*\>\<\/script[^\>]*\>#msi"
-                          , ''
-                          , $html
-                        );
+                $html = preg_replace("#(\<\s*link[^\>]*href\s*=\s*[\"\']([^\"\']*(jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[^\"\']*)[\"\'][^\>]*\>)#msi"
+                , "<!-- STYLE-KILLER:[\"$3\"]/REMOVED:[\"$2\"] -->",$html);
+                $html = preg_replace("#(\<\s*script[^\>]*src\s*=\s*[\"\']([^\"\']*(jquery|backbone|prototype|scriptaculous|thickbox|embed|a11|i18n|cleanfix)[^\"\']*)[\"\'][^\>]*\>\s*</script[^\>]*>)#msi"
+                , "<!-- SCRIPT-KILLER:[\"$3\"]/REMOVED:[\"$2\"] -->",$html);
                 /*-------------------------------------------------------------------------------------------------------------*/
                 $html = unprotect_pre_and_code_tags_content_from_change($html);  /*  unprotect (bring back) pre-tags and code-tags original content. */
     /*────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────*/
